@@ -1,0 +1,32 @@
+{
+  "name": "obsidian-optimized-graph",
+  "version": "0.1.0",
+  "description": "A performance-focused WebGL graph view for Obsidian.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production",
+    "typecheck": "tsc --noEmit",
+    "deploy:test": "bash ./scripts/deploy-test.sh"
+  },
+  "keywords": [
+    "obsidian",
+    "graph",
+    "webgl",
+    "sigma",
+    "zettelkasten"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "graphology": "^0.25.4",
+    "graphology-layout-forceatlas2": "^0.10.1",
+    "sigma": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "builtin-modules": "^4.0.0",
+    "esbuild": "^0.25.0",
+    "obsidian": "^1.8.7",
+    "typescript": "^5.7.3"
+  }
+}
