@@ -22,6 +22,16 @@ export const DEFAULT_SETTINGS:
   renderCurrentClusterOnly:
     false,
 
+  /*
+   * IMPORTANT:
+   *
+   * Keep the graph stationary unless the user explicitly
+   * starts layout or performs an interaction configured to
+   * resume it.
+   */
+  autoRunLayoutOnRefresh:
+    false,
+
   physicsAutoPauseSeconds:
     3,
 

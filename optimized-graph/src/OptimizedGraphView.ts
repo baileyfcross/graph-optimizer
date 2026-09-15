@@ -29,6 +29,27 @@ import type {
 export const VIEW_TYPE_OPTIMIZED_GRAPH =
   "optimized-graph-view";
 
+interface StoredCameraState {
+  x: number;
+  y: number;
+  angle: number;
+  ratio: number;
+}
+
+interface GraphBounds {
+  x:
+    [
+      number,
+      number,
+    ];
+
+  y:
+    [
+      number,
+      number,
+    ];
+}
+
 export class OptimizedGraphView
   extends ItemView {
   private readonly builder:
@@ -83,6 +104,15 @@ export class OptimizedGraphView
   private dirtyWhileHidden =
     false;
 
+  /*
+   * View-local camera state survives graph rebuilds so a
+   * metadata refresh does not pan/zoom the user elsewhere.
+   */
+  private cameraState:
+    StoredCameraState |
+    null =
+    null;
+
   constructor(
     leaf:
       WorkspaceLeaf,
@@ -121,11 +151,21 @@ export class OptimizedGraphView
 
     this.createShell();
 
+    /*
+     * Link correctness:
+     *
+     * MetadataCache.changed can fire before resolvedLinks has
+     * finished resolving the updated file graph.
+     *
+     * The graph is based on resolvedLinks, so rebuild after the
+     * cache's "resolved" event instead. Obsidian documents this
+     * event as firing after all files have been resolved.
+     */
     this.registerEvent(
       this.app
         .metadataCache
         .on(
-          "changed",
+          "resolved",
           () => {
             this.scheduleRefresh();
           },
@@ -196,6 +236,7 @@ export class OptimizedGraphView
     this.clearRefreshTimer();
 
     this.capturePositions();
+    this.captureCameraState();
 
     this.destroyRenderer();
   }
@@ -296,7 +337,7 @@ export class OptimizedGraphView
       cls:
         "optimized-graph-toolbar-hint",
       text:
-        "Double-click a node to open it. Drag nodes to reposition them.",
+        "The graph is static by default. Run layout only when you want nodes rearranged.",
     });
 
     this.statusEl =
@@ -387,10 +428,6 @@ export class OptimizedGraphView
         : "Building optimized graph…",
     );
 
-    /*
-     * Yield once before scanning metadata so UI input that
-     * triggered the refresh can finish painting first.
-     */
     await new Promise<void>(
       (resolve) => {
         window.requestAnimationFrame(
@@ -408,7 +445,12 @@ export class OptimizedGraphView
       return;
     }
 
+    /*
+     * Preserve both world positions and the user's current
+     * camera before replacing the renderer.
+     */
     this.capturePositions();
+    this.captureCameraState();
 
     this.destroyRenderer();
 
@@ -614,18 +656,44 @@ export class OptimizedGraphView
           enableEdgeEvents:
             false,
 
+          /*
+           * Preserve zoom-based label pruning, but do not hide
+           * labels merely because the camera is moving.
+           *
+           * This produces the intended behavior:
+           *
+           *   zoomed out
+           *     -> labels are aggressively pruned
+           *
+           *   zoom in until a label becomes eligible
+           *     -> the label appears
+           *
+           *   pan / drag around at that zoom level
+           *     -> the label remains visible
+           */
           hideEdgesOnMove:
             true,
 
           hideLabelsOnMove:
-            true,
+            false,
 
+          /*
+           * Restore the original density/grid behavior so a
+           * global overview does not show every node name.
+           */
           labelDensity:
             0.45,
 
           labelGridCellSize:
             120,
 
+          /*
+           * Restore the original apparent-size threshold.
+           *
+           * Sigma evaluates this against the node's rendered
+           * size, so zooming in naturally makes more labels
+           * eligible while zooming out prunes them again.
+           */
           labelRenderedSizeThreshold:
             7,
 
@@ -653,6 +721,30 @@ export class OptimizedGraphView
 
     this.renderer =
       renderer;
+
+    /*
+     * Sigma v3 normally derives normalization from the live
+     * graph bounds. Force-layout changes or incremental node
+     * additions can therefore make the entire scene appear to
+     * breathe/zoom even when the user did nothing.
+     *
+     * Freeze a padded bounding box after render. Node positions
+     * can still change when the user explicitly runs layout,
+     * but the camera frame itself remains stable.
+     */
+    this.freezeCurrentBounds(
+      renderer,
+    );
+
+    if (
+      this.cameraState
+    ) {
+      renderer
+        .getCamera()
+        .setState(
+          this.cameraState,
+        );
+    }
 
     this.installInteractions(
       renderer,
@@ -691,7 +783,19 @@ export class OptimizedGraphView
       false,
     );
 
-    this.startPhysics();
+    /*
+     * Static is now the default.
+     *
+     * Layout starts automatically only when the user has
+     * explicitly enabled that behavior in settings.
+     */
+    if (
+      this.plugin
+        .settings
+        .autoRunLayoutOnRefresh
+    ) {
+      this.startPhysics();
+    }
   }
 
   private installInteractions(
@@ -805,8 +909,8 @@ export class OptimizedGraphView
           !renderer
             .getCustomBBox()
         ) {
-          renderer.setCustomBBox(
-            renderer.getBBox(),
+          this.freezeCurrentBounds(
+            renderer,
           );
         }
       },
@@ -875,6 +979,7 @@ export class OptimizedGraphView
           .enable();
 
         this.capturePositions();
+        this.captureCameraState();
 
         if (
           this.plugin
@@ -913,19 +1018,27 @@ export class OptimizedGraphView
       return;
     }
 
-    this.renderer
-      .setCustomBBox(
-        null,
-      );
+    const renderer =
+      this.renderer;
 
-    this.renderer.refresh();
+    renderer.setCustomBBox(
+      null,
+    );
 
-    await this.renderer
+    renderer.refresh();
+
+    this.freezeCurrentBounds(
+      renderer,
+    );
+
+    await renderer
       .getCamera()
       .animatedReset({
         duration:
           250,
       });
+
+    this.captureCameraState();
   }
 
   private async openNode(
@@ -1035,6 +1148,105 @@ export class OptimizedGraphView
       );
   }
 
+  private captureCameraState():
+    void {
+    if (
+      !this.renderer
+    ) {
+      return;
+    }
+
+    const state =
+      this.renderer
+        .getCamera()
+        .getState();
+
+    this.cameraState = {
+      x:
+        state.x,
+
+      y:
+        state.y,
+
+      angle:
+        state.angle,
+
+      ratio:
+        state.ratio,
+    };
+  }
+
+  private freezeCurrentBounds(
+    renderer:
+      Sigma,
+  ): void {
+    const bounds =
+      renderer.getBBox();
+
+    renderer.setCustomBBox(
+      this.padBounds(
+        bounds,
+      ),
+    );
+  }
+
+  private padBounds(
+    bounds:
+      GraphBounds,
+  ): GraphBounds {
+    const xMin =
+      bounds.x[0];
+
+    const xMax =
+      bounds.x[1];
+
+    const yMin =
+      bounds.y[0];
+
+    const yMax =
+      bounds.y[1];
+
+    const xRange =
+      Math.max(
+        1,
+        xMax -
+          xMin,
+      );
+
+    const yRange =
+      Math.max(
+        1,
+        yMax -
+          yMin,
+      );
+
+    const xPadding =
+      xRange *
+      0.12;
+
+    const yPadding =
+      yRange *
+      0.12;
+
+    return {
+      x: [
+        xMin -
+          xPadding,
+
+        xMax +
+          xPadding,
+      ],
+
+      y: [
+        yMin -
+          yPadding,
+
+        yMax +
+          yPadding,
+      ],
+    };
+  }
+
   private destroyRenderer():
     void {
     this.physics?.kill();
@@ -1109,7 +1321,30 @@ export class OptimizedGraphView
       snapshot
         .stats
         .renderedNodes
-        ? ` · capped from ${snapshot.stats.candidateNodes.toLocaleString()} candidates`
+        ? ` · ${(
+            snapshot
+              .stats
+              .candidateNodes -
+            snapshot
+              .stats
+              .renderedNodes
+          ).toLocaleString()} nodes hidden by limits`
+        : "";
+
+    const connectionText =
+      snapshot
+        .stats
+        .hiddenConnections >
+      0
+        ? ` · ${snapshot.stats.hiddenConnections.toLocaleString()} links hidden by limits`
+        : "";
+
+    const orphanText =
+      snapshot
+        .stats
+        .prunedFalseOrphans >
+      0
+        ? ` · ${snapshot.stats.prunedFalseOrphans.toLocaleString()} false orphans suppressed`
         : "";
 
     this.statusEl.setText(
@@ -1117,7 +1352,9 @@ export class OptimizedGraphView
       `${snapshot.stats.renderedEdges.toLocaleString()} links · ` +
       `${physicsRunning ? "layout running" : "layout paused"}` +
       clusterText +
-      cappedText,
+      cappedText +
+      connectionText +
+      orphanText,
     );
   }
 

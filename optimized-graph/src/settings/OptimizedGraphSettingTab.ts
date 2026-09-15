@@ -318,10 +318,42 @@ export class OptimizedGraphSettingTab
       containerEl,
     )
       .setName(
+        "Run layout automatically after refresh",
+      )
+      .setDesc(
+        "When off, the graph stays completely stationary after opening or metadata refreshes. Use Run layout manually when you want ForceAtlas2 to rearrange nodes.",
+      )
+      .addToggle(
+        (toggle) =>
+          toggle
+            .setValue(
+              this.plugin
+                .settings
+                .autoRunLayoutOnRefresh,
+            )
+            .onChange(
+              async (
+                value,
+              ) => {
+                this.plugin
+                  .settings
+                  .autoRunLayoutOnRefresh =
+                    value;
+
+                await this.plugin
+                  .saveSettingsAndRefresh();
+              },
+            ),
+      );
+
+    new Setting(
+      containerEl,
+    )
+      .setName(
         "Pause physics automatically",
       )
       .setDesc(
-        "ForceAtlas2 runs in a Web Worker and stops automatically after this many seconds so it does not continuously consume CPU.",
+        "When layout is running, ForceAtlas2 stops automatically after this many seconds so it does not continuously consume CPU.",
       )
       .addDropdown(
         (dropdown) =>
