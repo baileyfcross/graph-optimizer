@@ -1,0 +1,9 @@
+{
+  "id": "optimized-graph",
+  "name": "Optimized Graph",
+  "version": "0.1.0",
+  "minAppVersion": "1.7.2",
+  "description": "A performance-focused WebGL graph view with bounded nodes, bounded links, folder filters, cluster rendering, and automatically paused physics.",
+  "author": "Local development",
+  "isDesktopOnly": true
+}

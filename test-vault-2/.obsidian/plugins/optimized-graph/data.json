@@ -1,0 +1,23 @@
+{
+  "settings": {
+    "maxVisibleNodes": 1000,
+    "maxLinksPerNode": 25,
+    "ignoreAttachments": true,
+    "ignoredFolders": [],
+    "minimumConnectionCount": 1,
+    "renderCurrentClusterOnly": false,
+    "physicsAutoPauseSeconds": 3,
+    "resumePhysicsOnDrag": true,
+    "refreshDebounceSeconds": 2
+  },
+  "positions": {
+    "6 - Full Notes/Algorithm Output.md": {
+      "x": 2.347733736038208,
+      "y": 1.1205326318740845
+    },
+    "6 - Full Notes/Algorithm Input.md": {
+      "x": -3.638951539993286,
+      "y": -0.3811004161834717
+    }
+  }
+}
