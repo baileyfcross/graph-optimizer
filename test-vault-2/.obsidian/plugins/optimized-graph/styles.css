@@ -11,27 +11,121 @@
 .optimized-graph-toolbar {
   flex: 0 0 auto;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 8px;
-  min-height: 42px;
+  min-height: 54px;
   padding: 6px 8px;
   border-bottom: 1px solid var(--background-modifier-border);
   background: var(--background-primary);
+  overflow-x: auto;
+  overflow-y: hidden;
   z-index: 2;
 }
 
-.optimized-graph-toolbar-button {
+/*
+ * Each main-page feature owns a dedicated fixed-width slot.
+ * Text/state changes inside one feature never move its neighbors.
+ */
+.optimized-graph-toolbar-slot {
   flex: 0 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
 }
 
-.optimized-graph-toolbar-hint {
+.optimized-graph-toolbar-slot-refresh {
+  width: 84px;
+}
+
+.optimized-graph-toolbar-slot-fit {
+  width: 64px;
+}
+
+.optimized-graph-toolbar-slot-layout {
+  /*
+   * Reserved for the widest state: "Pause layout".
+   */
+  width: 120px;
+}
+
+.optimized-graph-toolbar-slot-pruning {
+  width: 268px;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 2px;
+  padding: 2px 10px;
+  border-left: 1px solid var(--background-modifier-border);
+  border-right: 1px solid var(--background-modifier-border);
+}
+
+.optimized-graph-toolbar-button {
+  width: 100%;
   min-width: 0;
-  margin-left: auto;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.optimized-graph-toolbar-button-layout {
+  width: 100%;
+}
+
+.optimized-graph-pruning-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 56px;
+  align-items: center;
+  gap: 8px;
+}
+
+.optimized-graph-toolbar-control-label {
+  min-width: 0;
   color: var(--text-muted);
   font-size: var(--font-ui-smaller);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.optimized-graph-pruning-value {
+  width: 56px;
+  color: var(--text-normal);
+  font-size: var(--font-ui-smaller);
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.optimized-graph-pruning-slider {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  accent-color: var(--interactive-accent);
+}
+
+.optimized-graph-pruning-scale {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-faint);
+  font-size: 10px;
+  line-height: 1;
+  user-select: none;
+}
+
+.optimized-graph-info-window {
+  flex: 0 0 auto;
+  min-height: 32px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  color: var(--text-muted);
+  background: var(--background-primary);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  z-index: 2;
 }
 
 .optimized-graph-status {
@@ -71,4 +165,75 @@
   padding: 32px;
   color: var(--text-muted);
   text-align: center;
+}
+
+
+/*
+ * Lightweight Obsidian-style hover focus.
+ *
+ * Important performance detail:
+ * We do not run Sigma reducers across every node/edge while
+ * hovering. The existing WebGL canvases are simply faded and a
+ * single HTML overlay is drawn above them.
+ */
+.optimized-graph-canvas > canvas {
+  transition:
+    opacity 80ms linear;
+}
+
+.optimized-graph-canvas.is-hover-focused > canvas {
+  opacity: 0.16;
+}
+
+.optimized-graph-hover-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.optimized-graph-hover-overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.optimized-graph-hover-node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 999px;
+  background: var(--interactive-accent);
+  box-shadow:
+    0 0 0 2px var(--background-primary),
+    0 0 0 4px var(--interactive-accent);
+  will-change: transform;
+}
+
+.optimized-graph-hover-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: min(420px, 60vw);
+  color: var(--text-normal);
+  font-family: var(--font-interface);
+  font-size: calc(var(--font-ui-medium) * 1.2);
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /*
+   * No background box. A restrained text shadow preserves
+   * readability without recreating the old Sigma backdrop.
+   */
+  text-shadow:
+    0 1px 2px var(--background-primary),
+    0 -1px 2px var(--background-primary),
+    1px 0 2px var(--background-primary),
+    -1px 0 2px var(--background-primary);
+
+  will-change: transform;
 }

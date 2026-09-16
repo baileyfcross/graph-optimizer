@@ -1,6 +1,6 @@
 {
   "name": "obsidian-optimized-graph",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "A performance-focused WebGL graph view for Obsidian.",
   "main": "main.js",
   "scripts": {

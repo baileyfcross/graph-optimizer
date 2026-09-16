@@ -85,6 +85,16 @@ export class OptimizedGraphView
     null =
     null;
 
+  private labelPruningSlider:
+    HTMLInputElement |
+    null =
+    null;
+
+  private labelPruningValueEl:
+    HTMLElement |
+    null =
+    null;
+
   private refreshTimer:
     number |
     null =
@@ -103,6 +113,40 @@ export class OptimizedGraphView
 
   private dirtyWhileHidden =
     false;
+
+  /*
+   * Lightweight hover focus overlay.
+   *
+   * The graph itself remains WebGL-rendered. Hover focus is a
+   * single DOM node layered above the canvas, so we do not run
+   * nodeReducer/edgeReducer across the entire graph.
+   */
+  private hoverOverlayEl:
+    HTMLElement |
+    null =
+    null;
+
+  private hoverNodeEl:
+    HTMLElement |
+    null =
+    null;
+
+  private hoverLabelEl:
+    HTMLElement |
+    null =
+    null;
+
+  private hoveredNodeId:
+    string |
+    null =
+    null;
+
+  private labelForceMode:
+    "none" |
+    "normal" |
+    "all" |
+    null =
+    null;
 
   /*
    * View-local camera state survives graph rebuilds so a
@@ -269,8 +313,14 @@ export class OptimizedGraphView
           "optimized-graph-toolbar",
       });
 
+    const refreshSlot =
+      toolbar.createDiv({
+        cls:
+          "optimized-graph-toolbar-slot optimized-graph-toolbar-slot-refresh",
+      });
+
     const refreshButton =
-      toolbar.createEl(
+      refreshSlot.createEl(
         "button",
         {
           cls:
@@ -289,8 +339,14 @@ export class OptimizedGraphView
       },
     );
 
+    const fitSlot =
+      toolbar.createDiv({
+        cls:
+          "optimized-graph-toolbar-slot optimized-graph-toolbar-slot-fit",
+      });
+
     const fitButton =
-      toolbar.createEl(
+      fitSlot.createEl(
         "button",
         {
           cls:
@@ -307,12 +363,18 @@ export class OptimizedGraphView
       },
     );
 
+    const layoutSlot =
+      toolbar.createDiv({
+        cls:
+          "optimized-graph-toolbar-slot optimized-graph-toolbar-slot-layout",
+      });
+
     this.layoutButton =
-      toolbar.createEl(
+      layoutSlot.createEl(
         "button",
         {
           cls:
-            "optimized-graph-toolbar-button",
+            "optimized-graph-toolbar-button optimized-graph-toolbar-button-layout",
           text:
             "Run layout",
         },
@@ -333,9 +395,158 @@ export class OptimizedGraphView
         },
       );
 
-    toolbar.createDiv({
+    const labelControl =
+      toolbar.createDiv({
+        cls:
+          "optimized-graph-toolbar-slot optimized-graph-toolbar-slot-pruning",
+      });
+
+    const pruningHeader =
+      labelControl.createDiv({
+        cls:
+          "optimized-graph-pruning-header",
+      });
+
+    pruningHeader.createSpan({
       cls:
-        "optimized-graph-toolbar-hint",
+        "optimized-graph-toolbar-control-label",
+      text:
+        "Label pruning",
+    });
+
+    this.labelPruningValueEl =
+      pruningHeader.createSpan({
+        cls:
+          "optimized-graph-pruning-value",
+      });
+
+    const initialVisibility =
+      this.clampLabelVisibility(
+        this.plugin
+          .settings
+          .labelVisibility,
+      );
+
+    this.labelPruningValueEl
+      .setText(
+        initialVisibility
+          .toFixed(
+            2,
+          ),
+      );
+
+    this.labelPruningSlider =
+      labelControl.createEl(
+        "input",
+        {
+          cls:
+            "optimized-graph-pruning-slider",
+          attr: {
+            type:
+              "range",
+            min:
+              "0",
+            max:
+              "1",
+            step:
+              "0.01",
+            value:
+              initialVisibility
+                .toFixed(
+                  2,
+                ),
+            "aria-label":
+              "Label visibility",
+            title:
+              "0 hides all normal node labels. 1 shows all normal node labels.",
+          },
+        },
+      );
+
+    const pruningScale =
+      labelControl.createDiv({
+        cls:
+          "optimized-graph-pruning-scale",
+      });
+
+    pruningScale.createSpan({
+      text:
+        "0",
+    });
+
+    pruningScale.createSpan({
+      text:
+        "1",
+    });
+
+    const applyLabelVisibilityFromSlider =
+      (
+        persist:
+          boolean,
+      ): void => {
+        if (
+          !this.labelPruningSlider ||
+          !this.labelPruningValueEl
+        ) {
+          return;
+        }
+
+        const visibility =
+          this.clampLabelVisibility(
+            Number(
+              this.labelPruningSlider
+                .value,
+            ),
+          );
+
+        this.labelPruningValueEl
+          .setText(
+            visibility
+              .toFixed(
+                2,
+              ),
+          );
+
+        this.plugin
+          .settings
+          .labelVisibility =
+            visibility;
+
+        this.applyLabelVisibility(
+          visibility,
+        );
+
+        if (
+          persist
+        ) {
+          void this.plugin
+            .saveViewPreferences();
+        }
+      };
+
+    this.labelPruningSlider
+      .addEventListener(
+        "input",
+        () => {
+          applyLabelVisibilityFromSlider(
+            false,
+          );
+        },
+      );
+
+    this.labelPruningSlider
+      .addEventListener(
+        "change",
+        () => {
+          applyLabelVisibilityFromSlider(
+            true,
+          );
+        },
+      );
+
+    this.contentEl.createDiv({
+      cls:
+        "optimized-graph-info-window",
       text:
         "The graph is static by default. Run layout only when you want nodes rearranged.",
     });
@@ -353,6 +564,26 @@ export class OptimizedGraphView
         cls:
           "optimized-graph-canvas",
       });
+
+    this.hoverOverlayEl =
+      this.graphEl.createDiv({
+        cls:
+          "optimized-graph-hover-overlay",
+      });
+
+    this.hoverNodeEl =
+      this.hoverOverlayEl.createDiv({
+        cls:
+          "optimized-graph-hover-node",
+      });
+
+    this.hoverLabelEl =
+      this.hoverOverlayEl.createDiv({
+        cls:
+          "optimized-graph-hover-label",
+      });
+
+    this.clearHoverFocus();
   }
 
   private scheduleRefresh(
@@ -494,6 +725,8 @@ export class OptimizedGraphView
 
     this.graphEl.empty();
 
+    this.recreateHoverOverlay();
+
     if (
       snapshot.nodes.length ===
       0
@@ -588,8 +821,15 @@ export class OptimizedGraphView
                 ? colors.attachment
                 : colors.node,
 
+          isCurrent,
+
           forceLabel:
-            isCurrent,
+            this.forceLabelForVisibility(
+              this.plugin
+                .settings
+                .labelVisibility,
+              isCurrent,
+            ),
 
           zIndex:
             isCurrent
@@ -642,6 +882,13 @@ export class OptimizedGraphView
     this.graph =
       graph;
 
+    this.labelForceMode =
+      this.labelForceModeForVisibility(
+        this.plugin
+          .settings
+          .labelVisibility,
+      );
+
     const renderer =
       new Sigma(
         graph,
@@ -678,24 +925,37 @@ export class OptimizedGraphView
             false,
 
           /*
-           * Restore the original density/grid behavior so a
-           * global overview does not show every node name.
+           * Continuous 0..1 label visibility.
+           *
+           * 0:
+           *   hide all normal node labels
+           *
+           * 0.5:
+           *   approximately the previous Normal behavior
+           *
+           * 1:
+           *   every normal node label is force-enabled
            */
           labelDensity:
-            0.45,
+            this.labelDensityForVisibility(
+              this.plugin
+                .settings
+                .labelVisibility,
+            ),
 
           labelGridCellSize:
-            120,
+            this.labelGridCellSizeForVisibility(
+              this.plugin
+                .settings
+                .labelVisibility,
+            ),
 
-          /*
-           * Restore the original apparent-size threshold.
-           *
-           * Sigma evaluates this against the node's rendered
-           * size, so zooming in naturally makes more labels
-           * eligible while zooming out prunes them again.
-           */
           labelRenderedSizeThreshold:
-            7,
+            this.labelThresholdForVisibility(
+              this.plugin
+                .settings
+                .labelVisibility,
+            ),
 
           labelColor: {
             color:
@@ -825,6 +1085,12 @@ export class OptimizedGraphView
       ({
         node,
       }) => {
+        this.showHoverFocus(
+          renderer,
+          graph,
+          node,
+        );
+
         if (
           this.graphEl
         ) {
@@ -855,6 +1121,8 @@ export class OptimizedGraphView
     renderer.on(
       "leaveNode",
       () => {
+        this.clearHoverFocus();
+
         if (
           this.graphEl
         ) {
@@ -878,6 +1146,8 @@ export class OptimizedGraphView
       ({
         node,
       }) => {
+        this.clearHoverFocus();
+
         this.isDragging =
           true;
 
@@ -990,6 +1260,421 @@ export class OptimizedGraphView
         }
       },
     );
+  }
+
+  private clampLabelVisibility(
+    value:
+      number,
+  ): number {
+    if (
+      !Number.isFinite(
+        value,
+      )
+    ) {
+      return 0.5;
+    }
+
+    return Math.max(
+      0,
+      Math.min(
+        1,
+        value,
+      ),
+    );
+  }
+
+  private labelThresholdForVisibility(
+    value:
+      number,
+  ): number {
+    const visibility =
+      this.clampLabelVisibility(
+        value,
+      );
+
+    if (
+      visibility <=
+      0
+    ) {
+      return 1_000_000;
+    }
+
+    if (
+      visibility >=
+      1
+    ) {
+      return 0;
+    }
+
+    /*
+     * 0.5 -> 7, matching the previous Normal threshold.
+     */
+    return (
+      14 *
+      (
+        1 -
+        visibility
+      )
+    );
+  }
+
+  private labelDensityForVisibility(
+    value:
+      number,
+  ): number {
+    const visibility =
+      this.clampLabelVisibility(
+        value,
+      );
+
+    if (
+      visibility <=
+      0
+    ) {
+      return 0;
+    }
+
+    if (
+      visibility >=
+      1
+    ) {
+      return 1;
+    }
+
+    /*
+     * 0.5 -> 0.45, matching the previous default.
+     */
+    return (
+      0.1 +
+      (
+        visibility *
+        0.7
+      )
+    );
+  }
+
+  private labelGridCellSizeForVisibility(
+    value:
+      number,
+  ): number {
+    const visibility =
+      this.clampLabelVisibility(
+        value,
+      );
+
+    /*
+     * 0.5 -> 120, matching the previous default.
+     */
+    return (
+      160 -
+      (
+        visibility *
+        80
+      )
+    );
+  }
+
+  private labelForceModeForVisibility(
+    value:
+      number,
+  ):
+    "none" |
+    "normal" |
+    "all" {
+    const visibility =
+      this.clampLabelVisibility(
+        value,
+      );
+
+    if (
+      visibility <=
+      0
+    ) {
+      return "none";
+    }
+
+    if (
+      visibility >=
+      1
+    ) {
+      return "all";
+    }
+
+    return "normal";
+  }
+
+  private forceLabelForVisibility(
+    value:
+      number,
+
+    isCurrent:
+      boolean,
+  ): boolean {
+    const mode =
+      this.labelForceModeForVisibility(
+        value,
+      );
+
+    if (
+      mode ===
+      "none"
+    ) {
+      return false;
+    }
+
+    if (
+      mode ===
+      "all"
+    ) {
+      return true;
+    }
+
+    return isCurrent;
+  }
+
+  private applyLabelVisibility(
+    value:
+      number,
+  ): void {
+    const visibility =
+      this.clampLabelVisibility(
+        value,
+      );
+
+    const renderer =
+      this.renderer;
+
+    const graph =
+      this.graph;
+
+    if (
+      renderer
+    ) {
+      renderer.setSetting(
+        "labelRenderedSizeThreshold",
+        this.labelThresholdForVisibility(
+          visibility,
+        ),
+      );
+
+      renderer.setSetting(
+        "labelDensity",
+        this.labelDensityForVisibility(
+          visibility,
+        ),
+      );
+
+      renderer.setSetting(
+        "labelGridCellSize",
+        this.labelGridCellSizeForVisibility(
+          visibility,
+        ),
+      );
+    }
+
+    const nextForceMode =
+      this.labelForceModeForVisibility(
+        visibility,
+      );
+
+    /*
+     * Avoid walking every node on each 0.01 slider movement.
+     * A full forceLabel update is necessary only when crossing
+     * into or out of an endpoint mode.
+     */
+    if (
+      graph &&
+      nextForceMode !==
+        this.labelForceMode
+    ) {
+      graph.forEachNode(
+        (
+          node,
+          attributes,
+        ) => {
+          graph.setNodeAttribute(
+            node,
+            "forceLabel",
+            this.forceLabelForVisibility(
+              visibility,
+              Boolean(
+                attributes
+                  .isCurrent,
+              ),
+            ),
+          );
+        },
+      );
+
+      this.labelForceMode =
+        nextForceMode;
+    }
+
+    renderer?.refresh();
+  }
+
+  private recreateHoverOverlay():
+    void {
+    if (
+      !this.graphEl
+    ) {
+      return;
+    }
+
+    this.hoverOverlayEl =
+      this.graphEl.createDiv({
+        cls:
+          "optimized-graph-hover-overlay",
+      });
+
+    this.hoverNodeEl =
+      this.hoverOverlayEl.createDiv({
+        cls:
+          "optimized-graph-hover-node",
+      });
+
+    this.hoverLabelEl =
+      this.hoverOverlayEl.createDiv({
+        cls:
+          "optimized-graph-hover-label",
+      });
+
+    this.clearHoverFocus();
+  }
+
+  private showHoverFocus(
+    renderer:
+      Sigma,
+
+    graph:
+      Graph,
+
+    node:
+      string,
+  ): void {
+    if (
+      !this.graphEl ||
+      !this.hoverOverlayEl ||
+      !this.hoverNodeEl ||
+      !this.hoverLabelEl
+    ) {
+      return;
+    }
+
+    if (
+      !graph.hasNode(
+        node,
+      )
+    ) {
+      return;
+    }
+
+    const attributes =
+      graph.getNodeAttributes(
+        node,
+      );
+
+    const x =
+      Number(
+        attributes.x,
+      );
+
+    const y =
+      Number(
+        attributes.y,
+      );
+
+    if (
+      !Number.isFinite(
+        x,
+      ) ||
+      !Number.isFinite(
+        y,
+      )
+    ) {
+      return;
+    }
+
+    const position =
+      renderer.graphToViewport({
+        x,
+        y,
+      });
+
+    const displayData =
+      renderer.getNodeDisplayData(
+        node,
+      );
+
+    const radius =
+      Math.max(
+        6,
+        (
+          displayData
+            ?.size ??
+          Number(
+            attributes.size,
+          ) ??
+          4
+        ) *
+          1.6,
+      );
+
+    const label =
+      String(
+        attributes.label ??
+        node,
+      );
+
+    this.hoveredNodeId =
+      node;
+
+    this.graphEl.addClass(
+      "is-hover-focused",
+    );
+
+    this.hoverOverlayEl.addClass(
+      "is-visible",
+    );
+
+    this.hoverNodeEl.style.width =
+      `${radius * 2}px`;
+
+    this.hoverNodeEl.style.height =
+      `${radius * 2}px`;
+
+    this.hoverNodeEl.style.transform =
+      `translate(${position.x - radius}px, ${position.y - radius}px)`;
+
+    this.hoverLabelEl.setText(
+      label,
+    );
+
+    this.hoverLabelEl.style.transform =
+      `translate(${position.x + radius + 8}px, ${position.y}px) translateY(-50%)`;
+  }
+
+  private clearHoverFocus():
+    void {
+    this.hoveredNodeId =
+      null;
+
+    this.graphEl?.removeClass(
+      "is-hover-focused",
+    );
+
+    this.hoverOverlayEl
+      ?.removeClass(
+        "is-visible",
+      );
+
+    if (
+      this.hoverLabelEl
+    ) {
+      this.hoverLabelEl.setText(
+        "",
+      );
+    }
   }
 
   private startPhysics():
@@ -1249,6 +1934,8 @@ export class OptimizedGraphView
 
   private destroyRenderer():
     void {
+    this.clearHoverFocus();
+
     this.physics?.kill();
 
     this.physics =
@@ -1260,6 +1947,9 @@ export class OptimizedGraphView
       null;
 
     this.graph =
+      null;
+
+    this.labelForceMode =
       null;
 
     this.draggedNode =

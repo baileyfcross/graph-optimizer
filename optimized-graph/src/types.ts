@@ -34,6 +34,22 @@ export interface OptimizedGraphSettings {
 
   refreshDebounceSeconds:
     1 | 2 | 3 | 5;
+
+  /*
+   * View-toolbar preference only.
+   *
+   * Continuous label visibility:
+   *   0 = hide all normal node labels
+   *   1 = show all normal node labels
+   */
+  labelVisibility:
+    number;
+
+  /*
+   * Legacy value retained only for migration from older builds.
+   */
+  labelPruningThreshold?:
+    number;
 }
 
 export interface SavedGraphPosition {

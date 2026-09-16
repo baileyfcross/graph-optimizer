@@ -15,7 +15,9 @@ import {
 
 import {
   DEFAULT_SETTINGS,
+  legacyThresholdToLabelVisibility,
   normalizeIgnoredFolders,
+  normalizeLabelVisibility,
 } from "./settings/Settings";
 
 import type {
@@ -256,6 +258,16 @@ export default class OptimizedGraphPlugin
     );
   }
 
+  /*
+   * Persist toolbar/view preferences without forcing a graph
+   * rebuild. The view applies these renderer-only changes
+   * immediately.
+   */
+  async saveViewPreferences():
+    Promise<void> {
+    await this.persistData();
+  }
+
   refreshOpenViews(
     immediate:
       boolean,
@@ -327,6 +339,45 @@ export default class OptimizedGraphPlugin
           .ignoredFolders ??
           [],
       );
+
+    const storedVisibility =
+      data?.settings
+        ?.labelVisibility;
+
+    const legacyThreshold =
+      data?.settings
+        ?.labelPruningThreshold;
+
+    if (
+      typeof storedVisibility ===
+        "number" &&
+      Number.isFinite(
+        storedVisibility,
+      )
+    ) {
+      this.settings
+        .labelVisibility =
+        normalizeLabelVisibility(
+          storedVisibility,
+        );
+    } else if (
+      typeof legacyThreshold ===
+        "number"
+    ) {
+      this.settings
+        .labelVisibility =
+        legacyThresholdToLabelVisibility(
+          legacyThreshold,
+        );
+    } else {
+      this.settings
+        .labelVisibility =
+        DEFAULT_SETTINGS
+          .labelVisibility;
+    }
+
+    delete this.settings
+      .labelPruningThreshold;
 
     this.positions = {
       ...(

@@ -40,7 +40,65 @@ export const DEFAULT_SETTINGS:
 
   refreshDebounceSeconds:
     2,
+
+  /*
+   * Controlled from the Optimized Graph toolbar, not from the
+   * plugin Settings page.
+   *
+   * 0 = no normal labels
+   * 1 = all normal labels
+   */
+  labelVisibility:
+    0.5,
 };
+
+export function normalizeLabelVisibility(
+  value:
+    number,
+): number {
+  if (
+    !Number.isFinite(
+      value,
+    )
+  ) {
+    return 0.5;
+  }
+
+  return Math.max(
+    0,
+    Math.min(
+      1,
+      value,
+    ),
+  );
+}
+
+export function legacyThresholdToLabelVisibility(
+  threshold:
+    number,
+): number {
+  if (
+    !Number.isFinite(
+      threshold,
+    )
+  ) {
+    return 0.5;
+  }
+
+  return normalizeLabelVisibility(
+    1 -
+      (
+        Math.max(
+          0,
+          Math.min(
+            14,
+            threshold,
+          ),
+        ) /
+        14
+      ),
+  );
+}
 
 export function normalizeIgnoredFolders(
   folders:

@@ -1,6 +1,6 @@
 {
   "settings": {
-    "maxVisibleNodes": 2000,
+    "maxVisibleNodes": 1000,
     "maxLinksPerNode": 25,
     "ignoreAttachments": true,
     "ignoredFolders": [],
@@ -9,188 +9,189 @@
     "autoRunLayoutOnRefresh": false,
     "physicsAutoPauseSeconds": 3,
     "resumePhysicsOnDrag": true,
-    "refreshDebounceSeconds": 2
+    "refreshDebounceSeconds": 2,
+    "labelVisibility": 0.89
   },
   "positions": {
-    "c80andnetcore30moderncross-platformdevelopment.pdf.md": {
-      "x": 38.72452926635742,
-      "y": -3.916640520095825
-    },
-    "6 - Full Notes/C# Unary and Binary Operators.md": {
-      "x": 12.292922973632812,
-      "y": 91.95059967041016
-    },
-    "6 - Full Notes/C# Variable Declaration.md": {
-      "x": -60.23951721191406,
-      "y": -74.41719818115234
-    },
-    "6 - Full Notes/C# Type Inference.md": {
-      "x": -46.651126861572266,
-      "y": -105.62953186035156
-    },
-    "6 - Full Notes/C# Tuple Returns and Deconstruction.md": {
-      "x": 54.89212417602539,
-      "y": -25.3592472076416
-    },
-    "6 - Full Notes/C# Switch Expressions.md": {
-      "x": -13.455193519592285,
-      "y": 92.02733612060547
-    },
-    "6 - Full Notes/C# Structs and Value Types.md": {
-      "x": 73.69038391113281,
-      "y": -5.061443328857422
-    },
-    "6 - Full Notes/C# String Literals.md": {
-      "x": -57.565425872802734,
-      "y": -106.24003601074219
-    },
-    "6 - Full Notes/C# Static Constant and Readonly Fields.md": {
-      "x": 51.94053268432617,
-      "y": 20.619590759277344
-    },
-    "6 - Full Notes/C# Return Values.md": {
-      "x": 60.82317352294922,
-      "y": 9.620676040649414
-    },
-    "6 - Full Notes/C# Recursive Functions.md": {
-      "x": 62.0202522277832,
-      "y": -15.473714828491211
-    },
-    "6 - Full Notes/C# Properties and Indexers.md": {
-      "x": 40.12891387939453,
-      "y": 20.284950256347656
-    },
-    "6 - Full Notes/C# Preprocessor Directive.md": {
-      "x": -39.08108139038086,
-      "y": -96.5963363647461
-    },
-    "6 - Full Notes/C# Polymorphism and Overrides.md": {
-      "x": 17.722402572631836,
-      "y": -21.41880226135254
-    },
-    "6 - Full Notes/C# Pattern Matching.md": {
-      "x": 3.5357284545898438,
-      "y": 96.74028015136719
-    },
-    "6 - Full Notes/C# Optional and Named Arguments.md": {
-      "x": 22.414644241333008,
-      "y": -30.115211486816406
-    },
-    "6 - Full Notes/C# Parsing with TryParse.md": {
-      "x": -5.888592720031738,
-      "y": 97.0167465209961
-    },
-    "6 - Full Notes/C# Numeric Types.md": {
-      "x": -66.71058654785156,
-      "y": -100.72242736816406
-    },
-    "6 - Full Notes/C# Method Overloading.md": {
-      "x": 11.542108535766602,
-      "y": -14.114112854003906
-    },
-    "6 - Full Notes/C# Language Version.md": {
-      "x": -69.85971069335938,
-      "y": -80.93892669677734
-    },
-    "6 - Full Notes/C# Iteration Statements.md": {
-      "x": -20.208131790161133,
-      "y": 85.71835327148438
-    },
-    "6 - Full Notes/C# Interface Implementation.md": {
-      "x": 64.69013214111328,
-      "y": -2.395738363265991
-    },
-    "6 - Full Notes/C# If Statements.md": {
-      "x": -20.55992889404297,
-      "y": 75.74724578857422
-    },
-    "6 - Full Notes/C# Grammar and Vocabulary.md": {
-      "x": -71.46080017089844,
-      "y": -91.35725402832031
-    },
-    "6 - Full Notes/C# Fields and Access Modifiers.md": {
-      "x": 71.40225219726562,
-      "y": -16.655254364013672
-    },
-    "6 - Full Notes/C# Function Parameters.md": {
-      "x": 71.12619018554688,
-      "y": 7.723799705505371
-    },
-    "6 - Full Notes/C# Extension Methods.md": {
-      "x": 31.751388549804688,
-      "y": -29.697925567626953
-    },
-    "6 - Full Notes/C# Events.md": {
-      "x": 10.470291137695312,
-      "y": -4.3058624267578125
-    },
-    "6 - Full Notes/C# Enum Types.md": {
-      "x": 53.14361572265625,
-      "y": -35.918235778808594
-    },
-    "6 - Full Notes/C# Delegates.md": {
-      "x": 44.231937408447266,
-      "y": -30.118698120117188
-    },
-    "6 - Full Notes/C# Constructors.md": {
-      "x": 64.72566223144531,
-      "y": -27.571331024169922
-    },
-    "6 - Full Notes/C# Classes and Objects.md": {
-      "x": 15.101689338684082,
-      "y": 5.586609363555908
-    },
-    "6 - Full Notes/C# Class Libraries.md": {
-      "x": 62.53832244873047,
-      "y": 19.05631446838379
-    },
-    "6 - Full Notes/C# Checked Arithmetic.md": {
-      "x": 27.850950241088867,
-      "y": 47.16440200805664
-    },
-    "6 - Full Notes/C# Casting and Conversion.md": {
-      "x": 16.72273826599121,
-      "y": 47.25691604614258
-    },
-    "6 - Full Notes/C# Boolean Type.md": {
-      "x": -12.449241638183594,
-      "y": -52.191043853759766
-    },
-    "6 - Full Notes/C# Bitwise and Shift Operators.md": {
-      "x": 4.780411720275879,
-      "y": 37.77656936645508
-    },
-    "6 - Full Notes/C# Async and Await.md": {
-      "x": 38.000267028808594,
-      "y": -37.898704528808594
-    },
-    "6 - Full Notes/C# Assignment and Logical Operators.md": {
-      "x": 15.886441230773926,
-      "y": 37.3477897644043
-    },
-    "6 - Full Notes/C Sharp Operators Flow and Conversion.md": {
-      "x": 0.3584223687648773,
-      "y": 74.59370422363281
-    },
-    "6 - Full Notes/C Sharp Language and Type Fundamentals.md": {
-      "x": -52.81156539916992,
-      "y": -88.42668914794922
-    },
     "6 - Full Notes/Algorithm Output.md": {
-      "x": -130.2244415283203,
-      "y": 40.04706573486328
+      "x": 6.649909019470215,
+      "y": 135.99203491210938
     },
     "6 - Full Notes/Algorithm Input.md": {
-      "x": -138.8760986328125,
-      "y": 41.76215744018555
+      "x": 6.180752277374268,
+      "y": 144.804443359375
     },
     "6 - Full Notes/Algorithm Foundations.md": {
-      "x": -136.77084350585938,
-      "y": 29.824453353881836
+      "x": -4.863696575164795,
+      "y": 139.8395538330078
     },
     "6 - Full Notes/Algorithm Effectiveness.md": {
-      "x": -139.0448455810547,
-      "y": 18.625503540039062
+      "x": -16.31230926513672,
+      "y": 139.27574157714844
+    },
+    "6 - Full Notes/c80andnetcore30moderncross-platformdevelopment.pdf.md": {
+      "x": 4.96309232711792,
+      "y": -38.603641510009766
+    },
+    "6 - Full Notes/C# Variable Declaration.md": {
+      "x": -94.84477233886719,
+      "y": 49.434165954589844
+    },
+    "6 - Full Notes/C# Unary and Binary Operators.md": {
+      "x": 87.9677505493164,
+      "y": 34.287628173828125
+    },
+    "6 - Full Notes/C# Tuple Returns and Deconstruction.md": {
+      "x": 26.444963455200195,
+      "y": -65.67782592773438
+    },
+    "6 - Full Notes/C# Type Inference.md": {
+      "x": -102.89328002929688,
+      "y": 15.891529083251953
+    },
+    "6 - Full Notes/C# Switch Expressions.md": {
+      "x": 92.57976531982422,
+      "y": 8.256826400756836
+    },
+    "6 - Full Notes/C# Structs and Value Types.md": {
+      "x": 32.04901885986328,
+      "y": -46.701141357421875
+    },
+    "6 - Full Notes/C# String Literals.md": {
+      "x": -113.4395523071289,
+      "y": 21.121835708618164
+    },
+    "6 - Full Notes/C# Static Constant and Readonly Fields.md": {
+      "x": -20.601451873779297,
+      "y": -43.24801254272461
+    },
+    "6 - Full Notes/C# Return Values.md": {
+      "x": -15.194483757019043,
+      "y": -54.8907470703125
+    },
+    "6 - Full Notes/C# Recursive Functions.md": {
+      "x": 29.24240493774414,
+      "y": -35.80112838745117
+    },
+    "6 - Full Notes/C# Properties and Indexers.md": {
+      "x": -27.448057174682617,
+      "y": -36.573307037353516
+    },
+    "6 - Full Notes/C# Preprocessor Directive.md": {
+      "x": -86.23668670654297,
+      "y": 41.607608795166016
+    },
+    "6 - Full Notes/C# Polymorphism and Overrides.md": {
+      "x": -9.701499938964844,
+      "y": -14.341334342956543
+    },
+    "6 - Full Notes/C# Pattern Matching.md": {
+      "x": 79.36951446533203,
+      "y": 37.9715461730957
+    },
+    "6 - Full Notes/C# Parsing with TryParse.md": {
+      "x": 69.64221954345703,
+      "y": 36.89390563964844
+    },
+    "6 - Full Notes/C# Optional and Named Arguments.md": {
+      "x": -10.803129196166992,
+      "y": -70.0045166015625
+    },
+    "6 - Full Notes/C# Numeric Types.md": {
+      "x": -113.35215759277344,
+      "y": 41.785987854003906
+    },
+    "6 - Full Notes/C# Method Overloading.md": {
+      "x": -20.180818557739258,
+      "y": -62.889251708984375
+    },
+    "6 - Full Notes/C# Language Version.md": {
+      "x": -116.58079528808594,
+      "y": 31.598535537719727
+    },
+    "6 - Full Notes/C# Iteration Statements.md": {
+      "x": 96.0321273803711,
+      "y": 17.818445205688477
+    },
+    "6 - Full Notes/C# Interface Implementation.md": {
+      "x": -17.39208984375,
+      "y": -20.057926177978516
+    },
+    "6 - Full Notes/C# Grammar and Vocabulary.md": {
+      "x": -105.3792953491211,
+      "y": 48.619483947753906
+    },
+    "6 - Full Notes/C# If Statements.md": {
+      "x": 92.51819610595703,
+      "y": 26.43765640258789
+    },
+    "6 - Full Notes/C# Function Parameters.md": {
+      "x": 9.989749908447266,
+      "y": -13.937849044799805
+    },
+    "6 - Full Notes/C# Fields and Access Modifiers.md": {
+      "x": 30.54607582092285,
+      "y": -55.82309341430664
+    },
+    "6 - Full Notes/C# Extension Methods.md": {
+      "x": -4.527266025543213,
+      "y": -62.872657775878906
+    },
+    "6 - Full Notes/C# Events.md": {
+      "x": -20.790102005004883,
+      "y": -28.87394905090332
+    },
+    "6 - Full Notes/C# Enum Types.md": {
+      "x": 15.258756637573242,
+      "y": -71.81114196777344
+    },
+    "6 - Full Notes/C# Delegates.md": {
+      "x": 7.52271032333374,
+      "y": -65.21248626708984
+    },
+    "6 - Full Notes/C# Constructors.md": {
+      "x": 18.934432983398438,
+      "y": -59.81947326660156
+    },
+    "6 - Full Notes/C# Classes and Objects.md": {
+      "x": -26.571977615356445,
+      "y": -51.57631301879883
+    },
+    "6 - Full Notes/C# Class Libraries.md": {
+      "x": -0.6754175424575806,
+      "y": -10.795989990234375
+    },
+    "6 - Full Notes/C# Checked Arithmetic.md": {
+      "x": 43.587162017822266,
+      "y": -11.32269287109375
+    },
+    "6 - Full Notes/C# Casting and Conversion.md": {
+      "x": 46.89899826049805,
+      "y": -1.9551008939743042
+    },
+    "6 - Full Notes/C# Boolean Type.md": {
+      "x": -53.67831802368164,
+      "y": 0.1925225406885147
+    },
+    "6 - Full Notes/C# Bitwise and Shift Operators.md": {
+      "x": 53.87334442138672,
+      "y": -15.658169746398926
+    },
+    "6 - Full Notes/C# Async and Await.md": {
+      "x": 1.509907603263855,
+      "y": -73.52644348144531
+    },
+    "6 - Full Notes/C# Assignment and Logical Operators.md": {
+      "x": 36.72610092163086,
+      "y": 2.382633686065674
+    },
+    "6 - Full Notes/C Sharp Operators Flow and Conversion.md": {
+      "x": 73.1594467163086,
+      "y": 16.0426082611084
+    },
+    "6 - Full Notes/C Sharp Language and Type Fundamentals.md": {
+      "x": -98.16686248779297,
+      "y": 31.1345157623291
     }
   }
 }
