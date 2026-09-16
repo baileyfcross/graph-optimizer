@@ -49,7 +49,7 @@ export class OptimizedGraphSettingTab
         "Maximum visible nodes",
       )
       .setDesc(
-        "Hard cap on rendered graph nodes. Lower values are faster and reduce layout work.",
+        "Caps how many graph nodes are considered for rendering. All nodes disables only the node-count cap; other filters and the per-node link limit still apply.",
       )
       .addDropdown(
         (dropdown) =>
@@ -66,6 +66,14 @@ export class OptimizedGraphSettingTab
               "2000",
               "2,000 — large graph",
             )
+            .addOption(
+              "5000",
+              "5,000 — very large graph",
+            )
+            .addOption(
+              "all",
+              "All nodes — no node cap",
+            )
             .setValue(
               String(
                 this.plugin
@@ -77,15 +85,38 @@ export class OptimizedGraphSettingTab
               async (
                 value,
               ) => {
-                this.plugin
-                  .settings
-                  .maxVisibleNodes =
+                if (
+                  value ===
+                  "all"
+                ) {
+                  this.plugin
+                    .settings
+                    .maxVisibleNodes =
+                      "all";
+                } else {
+                  const numericValue =
                     Number(
                       value,
-                    ) as
-                      500 |
-                      1000 |
-                      2000;
+                    );
+
+                  if (
+                    numericValue !==
+                      500 &&
+                    numericValue !==
+                      1000 &&
+                    numericValue !==
+                      2000 &&
+                    numericValue !==
+                      5000
+                  ) {
+                    return;
+                  }
+
+                  this.plugin
+                    .settings
+                    .maxVisibleNodes =
+                      numericValue;
+                }
 
                 await this.plugin
                   .saveSettingsAndRefresh();

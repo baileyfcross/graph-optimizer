@@ -1,6 +1,10 @@
 export interface OptimizedGraphSettings {
   maxVisibleNodes:
-    500 | 1000 | 2000;
+    500 |
+    1000 |
+    2000 |
+    5000 |
+    "all";
 
   maxLinksPerNode:
     10 | 25 | 50;

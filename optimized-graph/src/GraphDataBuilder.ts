@@ -181,14 +181,21 @@ export class GraphDataBuilder {
      *
      * This version expands through connected neighbors first.
      */
+    const maximumVisibleNodes =
+      settings
+        .maxVisibleNodes ===
+        "all"
+        ? candidates.length
+        : settings
+            .maxVisibleNodes;
+
     const selectedPaths =
       this.selectNodes(
         candidates,
         adjacency,
         degree,
         currentFilePath,
-        settings
-          .maxVisibleNodes,
+        maximumVisibleNodes,
         Boolean(
           settings
             .renderCurrentClusterOnly &&
